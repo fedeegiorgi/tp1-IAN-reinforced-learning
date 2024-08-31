@@ -1,6 +1,7 @@
 from random import randint
 from utils import puntaje_y_no_usados, separar, JUGADA_PLANTARSE, JUGADA_TIRAR
 from jugador import Jugador, JugadorAleatorio, JugadorSiempreSePlanta
+from template import AmbienteDiezMil, EstadoDiezMil, AgenteQLearning, JugadorEntrenado
 
 class JuegoDiezMil:
     def __init__(self, jugador: Jugador):
@@ -63,12 +64,24 @@ class JuegoDiezMil:
 
 
 def main():
-    jugador = JugadorAleatorio('random')
-    juego = JuegoDiezMil(jugador)
-    (cantidad_turnos, puntaje_final) = juego.jugar(verbose=True)
-    print(jugador.nombre, cantidad_turnos, puntaje_final)
+    # jugador = JugadorAleatorio('random')
+    # juego = JuegoDiezMil(jugador)
+    # (cantidad_turnos, puntaje_final) = juego.jugar(verbose=True)
+    # print(jugador.nombre, cantidad_turnos, puntaje_final)
 
-    jugador = JugadorSiempreSePlanta('plantón')
+    # jugador = JugadorSiempreSePlanta('plantón')
+    # juego = JuegoDiezMil(jugador)
+    # (cantidad_turnos, puntaje_final) = juego.jugar(verbose=True)
+    # print(jugador.nombre, cantidad_turnos, puntaje_final)
+
+    # Entrenamiento
+    # ambiente = AmbienteDiezMil()
+    # agente = AgenteQLearning(ambiente, 0.01, 1, 0.05)
+    # agente.entrenar(100000)
+    # agente.guardar_politica('goat_politics.json')
+
+    # Juego
+    jugador = JugadorEntrenado('goat', 'goat_politics.json')
     juego = JuegoDiezMil(jugador)
     (cantidad_turnos, puntaje_final) = juego.jugar(verbose=True)
     print(jugador.nombre, cantidad_turnos, puntaje_final)
