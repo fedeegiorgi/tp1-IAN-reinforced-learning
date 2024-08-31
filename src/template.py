@@ -23,7 +23,8 @@ class AmbienteDiezMil:
         """
 
         self.turno_actual = 1
-        self.estado_actual = EstadoDiezMil(6, 0, 0)
+        self.estado_actual = EstadoDiezMil(6, 0)
+        self.puntos_totales = 0
         self.min_max_cara_dado = [1, 6]
         self.acciones_posibles = [JUGADA_PLANTARSE, JUGADA_TIRAR]
 
@@ -41,7 +42,8 @@ class AmbienteDiezMil:
         """
 
         self.turno_actual = 1
-        self.estado_actual = EstadoDiezMil(6, 0, 0)
+        self.estado_actual = EstadoDiezMil(6, 0)
+        self.puntos_totales = 0
 
     def step(self, accion):
         """
@@ -57,8 +59,8 @@ class AmbienteDiezMil:
         """
 
         if accion == JUGADA_PLANTARSE:
-            self.estado_actual.puntos_totales += self.estado_actual.puntos_turno
-            if self.estado_actual.puntos_totales >= 10000:
+            self.puntos_totales += self.estado_actual.puntos_turno
+            if self.puntos_totales >= 10000:
                 cant_turnos = self.turno_actual
                 self.reset()
                 return (-cant_turnos, True)
@@ -80,7 +82,7 @@ class AmbienteDiezMil:
 
 
 class EstadoDiezMil:
-    def __init__(self, dados, puntos_turno, puntos_totales):
+    def __init__(self, dados, puntos_turno):
         """
         Definir qué hace a un estado de diez mil.
         Recordar que la complejidad del estado repercute en la complejidad de la tabla del agente de q-learning.
@@ -88,7 +90,6 @@ class EstadoDiezMil:
 
         self.dados = dados
         self.puntos_turno = puntos_turno
-        self.puntos_totales = puntos_totales
 
     def fin_turno(self):
         """
@@ -107,7 +108,7 @@ class EstadoDiezMil:
             str: Representación en texto de EstadoDiezMil.
         """
 
-        return f'cant_dados: {self.dados} | puntos_turno: {self.puntos_turno} | puntos_totales: {self.puntos_totales}'
+        return f'cant_dados: {self.dados} | puntos_turno: {self.puntos_turno}'
 
 class AgenteQLearning:
     def __init__(
@@ -216,7 +217,6 @@ class JugadorEntrenado(Jugador):
 
     def jugar(
         self,
-        puntaje_total: int,
         puntaje_turno: int,
         dados: list[int],
     ) -> tuple[int, list[int]]:
@@ -233,7 +233,7 @@ class JugadorEntrenado(Jugador):
         """
         puntaje, no_usados = puntaje_y_no_usados(dados)
 
-        estado = f'cant_dados: {len(no_usados)} | puntos_turno: {puntaje_turno + puntaje} | puntos_totales: {puntaje_total}'
+        estado = f'cant_dados: {len(no_usados)} | puntos_turno: {puntaje_turno + puntaje}'
         jugada = self.politica[estado]
 
         if jugada == JUGADA_PLANTARSE:
@@ -242,10 +242,8 @@ class JugadorEntrenado(Jugador):
             return (JUGADA_TIRAR, no_usados)
 
 
-
 '''
 cant_dados [0, 1, 2, 3, 4, 5, 6] = 7
 puntos_turno [0, 50, 100, 150, ... 10000] = 10000 / 50 = 200
 puntos_totales [0, 50, 100, ... 20000] = 20000 / 50 = 400
-
 '''

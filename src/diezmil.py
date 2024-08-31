@@ -31,7 +31,7 @@ class JuegoDiezMil:
                 (puntaje_tirada, _) = puntaje_y_no_usados(dados)
                 msg += ' ' + ''.join(map(str, dados)) + ' '
 
-                if puntaje_tirada == 0:  
+                if puntaje_tirada == 0:
                     # Mala suerte, no suma nada. Pierde el turno.
                     fin_de_turno = True
                     puntaje_turno = 0
@@ -77,7 +77,7 @@ def main():
     # Entrenamiento
     # ambiente = AmbienteDiezMil()
     # agente = AgenteQLearning(ambiente, 0.01, 1, 0.05)
-    # agente.entrenar(100000)
+    # agente.entrenar(10000)
     # agente.guardar_politica('goat_politics.json')
 
     # Juego
