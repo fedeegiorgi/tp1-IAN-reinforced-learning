@@ -5,17 +5,21 @@ from tqdm import tqdm
 from jugador import Jugador
 
 class AmbienteDiezMil:
-    
     def __init__(self):
         """Definir las variables de instancia de un ambiente.
         ¿Qué es propio de un ambiente de 10.000?
         """
-        pass
+        self.dados_actuales = []
+        self.turno_actual = 0
+        self.puntuacion_turno = 0
+        self.puntuacion_actual = 0
+        self.state_matrix = {}
 
     def reset(self):
         """Reinicia el ambiente para volver a realizar un episodio.
         """
-        pass
+        self.turno_actual = 0
+        self.puntuacion_actual = 0
 
     def step(self, accion):
         """Dada una acción devuelve una recompensa.
@@ -28,7 +32,17 @@ class AmbienteDiezMil:
         Returns:
             tuple[int, bool]: Una recompensa y un flag que indica si terminó el turno. 
         """
-        pass
+        if accion == 'Plantarse':
+            self.puntuacion_actual += 0  # Sumas puntos del turno.
+            if self.puntuacion_actual >= 10000:
+                return (-self.turno_actual, True)
+            else:
+                self.turno_actual += 1
+                return (0, False)
+        else:
+            pass
+            # Ver que se responde cuando juega
+
 
 class EstadoDiezMil:
     def __init__(self):
@@ -45,7 +59,7 @@ class EstadoDiezMil:
             ... (_type_): _description_
         """
         pass
-    
+
     def fin_turno(self):
         """Modifica el estado al terminar el turno.
         """
@@ -58,7 +72,7 @@ class EstadoDiezMil:
         Returns:
             str: Representación en texto de EstadoDiezMil.
         """
-        pass   
+        pass
 
 class AgenteQLearning:
     def __init__(
@@ -107,8 +121,8 @@ class JugadorEntrenado(Jugador):
     def __init__(self, nombre: str, filename_politica: str):
         self.nombre = nombre
         self.politica = self._leer_politica(filename_politica)
-        
-    def _leer_politica(self, filename:str, SEP:str=','):
+
+    def _leer_politica(self, filename: str, SEP: str = ','):
         """Carga una politica entrenada con un agente de RL, que está guardada
         en el archivo filename en un formato conveniente.
 
@@ -116,13 +130,13 @@ class JugadorEntrenado(Jugador):
             filename (str): Nombre/Path del archivo que contiene a una política almacenada. 
         """
         pass
-    
+
     def jugar(
         self,
-        puntaje_total:int,
-        puntaje_turno:int,
-        dados:list[int],
-    ) -> tuple[int,list[int]]:
+        puntaje_total: int,
+        puntaje_turno: int,
+        dados: list[int],
+    ) -> tuple[int, list[int]]:
         """Devuelve una jugada y los dados a tirar.
 
         Args:
@@ -138,7 +152,7 @@ class JugadorEntrenado(Jugador):
         # COMPLETAR
         # estado = ...
         # jugada = self.politica[estado]
-       
+
         # if jugada==JUGADA_PLANTARSE:
         #     return (JUGADA_PLANTARSE, [])
         # elif jugada==JUGADA_TIRAR:

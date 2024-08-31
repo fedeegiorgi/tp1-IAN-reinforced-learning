@@ -6,8 +6,8 @@ class JuegoDiezMil:
     def __init__(self, jugador: Jugador):
         self.jugador: Jugador = jugador
 
-    def jugar(self, verbose:bool=False, tope_turnos:int=1000) -> tuple[int,int]:
-        ''' Juega un juego de 10mil para un jugador, hasta terminar o hasta 
+    def jugar(self, verbose: bool = False, tope_turnos: int = 1000) -> tuple[int, int]:
+        ''' Juega un juego de 10mil para un jugador, hasta terminar o hasta
             llegar a tope_turnos turnos. Devuelve la cantidad de turnos que
             necesitó y el puntaje final.
         '''
@@ -57,7 +57,8 @@ class JuegoDiezMil:
 
             puntaje_total += puntaje_turno
             msg += ' --> ' + str(puntaje_turno) + ' puntos. TOTAL: ' + str(puntaje_total)
-            if verbose: print(msg)
+            if verbose:
+                print(msg)
         return (turno, puntaje_total)
 
 
@@ -71,6 +72,7 @@ def main():
     juego = JuegoDiezMil(jugador)
     (cantidad_turnos, puntaje_final) = juego.jugar(verbose=True)
     print(jugador.nombre, cantidad_turnos, puntaje_final)
+
 
 if __name__ == '__main__':
     main()
