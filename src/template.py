@@ -58,7 +58,7 @@ class AmbienteDiezMil:
             tuple[int, bool]: Una recompensa y un flag que indica si terminó el episodio.
         """
         assert accion in self.acciones_posibles
-        recompensa = 0
+        recompensa = self.estado_actual.puntos_turno
         partida_terminada = False
 
         if accion == JUGADA_PLANTARSE:
@@ -66,7 +66,6 @@ class AmbienteDiezMil:
 
             if self.puntos_totales >= 10000:
                 partida_terminada = True
-                recompensa = -self.turno_actual
                 self.reset()
             else:
                 self.estado_actual.fin_turno()
