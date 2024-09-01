@@ -38,7 +38,7 @@ class JuegoDiezMil:
 
                 else:
                     # Bien, suma puntos. Preguntamos al jugador qué quiere hacer.
-                    jugada, dados_a_tirar = self.jugador.jugar(puntaje_total, puntaje_turno, dados)
+                    jugada, dados_a_tirar = self.jugador.jugar(puntaje_turno, dados)
 
                     if jugada == JUGADA_PLANTARSE:
                         msg += 'P'
@@ -80,7 +80,8 @@ def main():
     # agente.entrenar(10000)
     # agente.guardar_politica('goat_politics.json')
 
-    # Juego
+    # # Juego
+
     jugador = JugadorEntrenado('goat', 'goat_politics.json')
     juego = JuegoDiezMil(jugador)
     (cantidad_turnos, puntaje_final) = juego.jugar(verbose=True)

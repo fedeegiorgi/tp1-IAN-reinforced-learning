@@ -160,8 +160,6 @@ class AgenteQLearning:
     def actualizar_tabla(self, key, recompensa, accion_elegida):
         estimacion_error = self.qlearning_tabla[key][accion_elegida]
         qlearn_siguiente_key = str(self.ambiente.estado_actual)
-        if qlearn_siguiente_key not in self.qlearning_tabla.keys():
-            self.qlearning_tabla[qlearn_siguiente_key] = [-25, -25]
         max_q = self.elegir_accion(eps_greedy=False)
         self.qlearning_tabla[key][accion_elegida] += self.alpha * (recompensa + self.gamma * max_q - estimacion_error)
 
@@ -174,14 +172,18 @@ class AgenteQLearning:
             episodios (int): Cantidad de episodios a iterar.
             verbose (bool, optional): Flag para hacer visible qué ocurre en cada paso. Defaults to False.
         """
+        for N in range(7):
+            for Y in range(0, 20001, 50):
+                # Create the key using the format specified
+                key = f'cant_dados: {N} | puntos_turno: {Y}'
+                # Assign an initial value (None or any other value you prefer)
+                self.qlearning_tabla[key] = [-20,-20]
 
         for _ in tqdm(range(episodios)):
             termino_episodio = False
             while not termino_episodio:
                 accion_elegida = self.elegir_accion()
                 qlearn_key = str(self.ambiente.estado_actual)
-                if qlearn_key not in self.qlearning_tabla.keys():
-                    self.qlearning_tabla[qlearn_key] = [-25, -25]
                 recompensa, termino_episodio = self.ambiente.step(accion_elegida)
                 self.actualizar_tabla(qlearn_key, recompensa, accion_elegida)
 
@@ -231,14 +233,16 @@ class JugadorEntrenado(Jugador):
         Returns:
             tuple[int,list[int]]: Una jugada y la lista de dados a tirar.
         """
-        puntaje, no_usados = puntaje_y_no_usados(dados)
+        _, no_usados = puntaje_y_no_usados(dados)
 
-        estado = f'cant_dados: {len(no_usados)} | puntos_turno: {puntaje_turno + puntaje}'
+        estado = f'cant_dados: {len(no_usados)} | puntos_turno: {puntaje_turno }'
         jugada = self.politica[estado]
+        jugada = np.argmax(jugada)
+        
 
-        if jugada == JUGADA_PLANTARSE:
+        if jugada == 0:
             return (JUGADA_PLANTARSE, [])
-        elif jugada == JUGADA_TIRAR:
+        elif jugada == 1:
             return (JUGADA_TIRAR, no_usados)
 
 
