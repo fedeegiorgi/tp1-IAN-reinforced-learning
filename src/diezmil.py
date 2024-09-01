@@ -76,7 +76,7 @@ def main():
 
     # Entrenamiento
     ambiente = AmbienteDiezMil()
-    agente = AgenteQLearning(ambiente, 0.1, 1, 0.1)
+    agente = AgenteQLearning(ambiente, 0.01, 1, 0.05)
     agente.entrenar(3000)
     agente.guardar_politica('goat_policy.json')
 

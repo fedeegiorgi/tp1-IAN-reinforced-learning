@@ -66,14 +66,7 @@ class AmbienteDiezMil:
 
             if self.puntos_totales >= 10000:
                 partida_terminada = True
-                if self.turno_actual < 15:
-                    recompensa = 15
-                elif self.turno_actual < 20:
-                    recompensa = 10
-                elif self.turno_actual < 25:
-                    recompensa = 5
-                else:
-                    recompensa = 1
+                recompensa = 20
                 self.reset()
             else:
                 self.estado_actual.fin_turno()
@@ -188,9 +181,9 @@ class AgenteQLearning:
                 key = f'cant_dados: {N} | puntos_turno: {Y}'
 
                 if N == 0:
-                    self.qlearning_tabla[key] = [-50, 0]
+                    self.qlearning_tabla[key] = [0, 0]
                 elif N == 6:
-                    self.qlearning_tabla[key] = [0, -50]
+                    self.qlearning_tabla[key] = [0, 0]
                 else:
                     self.qlearning_tabla[key] = [0, 0]
 
