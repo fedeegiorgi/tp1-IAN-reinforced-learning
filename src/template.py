@@ -58,7 +58,7 @@ class AmbienteDiezMil:
             tuple[int, bool]: Una recompensa y un flag que indica si terminó el episodio.
         """
         assert accion in self.acciones_posibles
-        recompensa = -1
+        recompensa = 0
         partida_terminada = False
 
         if accion == JUGADA_PLANTARSE:
@@ -66,7 +66,7 @@ class AmbienteDiezMil:
 
             if self.puntos_totales >= 10000:
                 partida_terminada = True
-                recompensa = 20
+                recompensa = -self.turno_actual
                 self.reset()
             else:
                 self.estado_actual.fin_turno()
@@ -180,12 +180,7 @@ class AgenteQLearning:
 
                 key = f'cant_dados: {N} | puntos_turno: {Y}'
 
-                if N == 0:
-                    self.qlearning_tabla[key] = [0, 0]
-                elif N == 6:
-                    self.qlearning_tabla[key] = [0, 0]
-                else:
-                    self.qlearning_tabla[key] = [0, 0]
+                self.qlearning_tabla[key] = [-25, -25]
 
         for _ in tqdm(range(episodios)):
             termino_episodio = False
