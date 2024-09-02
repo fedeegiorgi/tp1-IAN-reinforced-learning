@@ -74,9 +74,12 @@ class AmbienteDiezMil:
         else:
             tirada = self.tirada(self.estado_actual.dados)
             puntos_tirada, dados_restantes = puntaje_y_no_usados(tirada)
-            
+
             if puntos_tirada == 0:
-                recompensa = -self.estado_actual.puntos_turno / (self.estado_actual.dados + 1)
+                if self.estado_actual.dados == 0:
+                    recompensa = -self.estado_actual.puntos_turno / 6
+                else:
+                    recompensa = -self.estado_actual.puntos_turno / (self.estado_actual.dados)
                 self.estado_actual.fin_turno()
                 self.turno_actual += 1
             else:

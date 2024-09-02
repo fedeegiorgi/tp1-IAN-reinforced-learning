@@ -76,8 +76,8 @@ def main():
 
     # Entrenamiento
     ambiente = AmbienteDiezMil()
-    agente = AgenteQLearning(ambiente, 0.05, 0.75, 0.09)
-    agente.entrenar(40000)
+    agente = AgenteQLearning(ambiente, 0.05, 0.75, 0.05)
+    agente.entrenar(100000)
     agente.guardar_politica('goat_policy.json')
 
     # # Juego
@@ -87,13 +87,13 @@ def main():
     # print(jugador.nombre, cantidad_turnos, puntaje_final)
 
     avg = 0
-    for _ in range(1000):
+    for _ in range(10000):
         jugador = JugadorEntrenado('goat', 'goat_policy.json')
         juego = JuegoDiezMil(jugador)
         (cantidad_turnos, puntaje_final) = juego.jugar(verbose=False)
         avg += cantidad_turnos
-        print(jugador.nombre, cantidad_turnos, puntaje_final)
-    print(avg / 1000)
+        # print(jugador.nombre, cantidad_turnos, puntaje_final)
+    print(avg / 10000)
 
 if __name__ == '__main__':
     main()
