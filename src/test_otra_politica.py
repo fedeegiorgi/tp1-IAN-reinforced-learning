@@ -56,7 +56,7 @@ class AmbienteDiezMil:
 
             if self.puntos_totales >= 10000:
                 partida_terminada = True
-                recompensa = 10000 / self.turno_actual
+                recompensa = 10000
                 self.reset()
             else:
                 self.estado_actual.fin_turno()
