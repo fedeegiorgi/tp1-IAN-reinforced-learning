@@ -176,7 +176,12 @@ class AgenteQLearning:
 
                 self.qlearning_tabla[key] = [0, 0]
 
-        for _ in tqdm(range(episodios)):
+        if verbose:
+            rango_episodios = tqdm(range(episodios))
+        else:
+            rango_episodios = range(episodios)
+
+        for _ in rango_episodios:
             termino_episodio = False
             while not termino_episodio:
                 accion_elegida = self.elegir_accion()

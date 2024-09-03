@@ -1,7 +1,13 @@
+import os
+import math
+from tqdm import tqdm
 from random import randint
 from utils import puntaje_y_no_usados, separar, JUGADA_PLANTARSE, JUGADA_TIRAR
 from jugador import Jugador, JugadorAleatorio, JugadorSiempreSePlanta
 from template import AmbienteDiezMil, EstadoDiezMil, AgenteQLearning, JugadorEntrenado
+
+TRAIN = True
+RUN_AVG_TURN_TEST = True
 
 class JuegoDiezMil:
     def __init__(self, jugador: Jugador):
@@ -62,38 +68,66 @@ class JuegoDiezMil:
                 print(msg)
         return (turno, puntaje_total)
 
-
-def main():
-    # jugador = JugadorAleatorio('random')
-    # juego = JuegoDiezMil(jugador)
-    # (cantidad_turnos, puntaje_final) = juego.jugar(verbose=True)
-    # print(jugador.nombre, cantidad_turnos, puntaje_final)
-
-    # jugador = JugadorSiempreSePlanta('plantón')
-    # juego = JuegoDiezMil(jugador)
-    # (cantidad_turnos, puntaje_final) = juego.jugar(verbose=True)
-    # print(jugador.nombre, cantidad_turnos, puntaje_final)
-
-    # Entrenamiento
-    ambiente = AmbienteDiezMil()
-    agente = AgenteQLearning(ambiente, 0.05, 0.75, 0.05)
-    agente.entrenar(100000)
-    agente.guardar_politica('goat_policy.json')
-
-    # # Juego
-    # jugador = JugadorEntrenado('goat', 'goat_policy.json')
-    # juego = JuegoDiezMil(jugador)
-    # (cantidad_turnos, puntaje_final) = juego.jugar(verbose=True)
-    # print(jugador.nombre, cantidad_turnos, puntaje_final)
-
+def get_promedio_turnos(jugador, num_partidas):
     avg = 0
-    for _ in range(10000):
-        jugador = JugadorEntrenado('goat', 'goat_policy.json')
+    for _ in range(num_partidas):
         juego = JuegoDiezMil(jugador)
         (cantidad_turnos, puntaje_final) = juego.jugar(verbose=False)
         avg += cantidad_turnos
-        # print(jugador.nombre, cantidad_turnos, puntaje_final)
-    print(avg / 10000)
+    return avg / num_partidas
+
+def grid_search_hiperparametros(lr_range, gamma_range, eps_range, episodios, cant_partidas_promedio, verbose=False):
+    ambiente = AmbienteDiezMil()
+    mejor_promedio = math.inf
+
+    for lr in lr_range:
+        for gamma in gamma_range:
+            for eps in eps_range:
+                if verbose:
+                    print(f'Probando con: LR = {lr:.2f} | Gamma: {gamma:.2f} | Epsilon: {eps:.2f}')
+                agente = AgenteQLearning(ambiente, lr, gamma, eps)
+                agente.entrenar(episodios)
+                agente.guardar_politica('test_policy.json')
+                jugador = JugadorEntrenado('TestAgent', 'test_policy.json')
+                turnos_promedio = get_promedio_turnos(jugador, cant_partidas_promedio)
+                if turnos_promedio < mejor_promedio:
+                    best_lr, best_gamma, best_eps = lr, gamma, eps
+                    if verbose:
+                        print(f'Nuevo mejor promedio obtenido: {turnos_promedio}. LR: {lr:.2f} | Gamma: {gamma:.2f} | Epsilon: {eps:.2f}')
+                else:
+                    if verbose:
+                        print(f'Promedio obtenido: {turnos_promedio} [LR: {lr:.2f} | Gamma: {gamma:.2f} | Epsilon: {eps:.2f}]')
+
+    # Si el archivo se corre por fuera de la carpeta y el archivo se genera afuera, no borrarlo pero no tirar error.
+    try:
+        os.remove('test_policy.json')
+    except Exception:
+        pass
+
+    if verbose:
+        print(f'Mejores hiperparametros obtenidos: LR: {best_lr} | Gamma: {best_gamma} | Epsilon: {best_eps}')
+
+    return best_lr, best_gamma, best_eps
+
+def main():
+    if TRAIN:
+        lr_list = [0.05, 0.1, 0.2]
+        gamma_list = [0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 1]
+        eps_list = [0.05, 0.1, 0.2]
+        best_lr, best_gamma, best_eps = grid_search_hiperparametros(lr_list, gamma_list, eps_list, 10000, 10000)
+        ambiente = AmbienteDiezMil()
+        agente = AgenteQLearning(ambiente, best_lr, best_gamma, best_eps)
+        agente.entrenar(100000, verbose=True)
+        agente.guardar_politica('agent_policy.json')
+
+    if RUN_AVG_TURN_TEST:
+        n_agentes, n_partidas = 10, 10000
+        averages = []
+        for _ in tqdm(range(n_agentes)):
+            jugador = JugadorEntrenado('FinalAgent', 'agent_policy.json')
+            averages.append(get_promedio_turnos(jugador, n_partidas))
+        print(f'Resultado obtenido con {n_agentes} agentes que jugaron {n_partidas} partidas: {sum(averages) / len(averages)}')
+
 
 if __name__ == '__main__':
     main()
