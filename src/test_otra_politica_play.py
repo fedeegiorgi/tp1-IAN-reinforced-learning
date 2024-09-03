@@ -1,9 +1,10 @@
+from tqdm import tqdm
 from random import randint
 from utils import puntaje_y_no_usados, separar, JUGADA_PLANTARSE, JUGADA_TIRAR
 from jugador import Jugador, JugadorAleatorio, JugadorSiempreSePlanta
 from test_otra_politica import AmbienteDiezMil, EstadoDiezMil, AgenteQLearning, JugadorEntrenado
 
-TRAIN = False
+TRAIN = True
 RUN_AVG_TURN_TEST = True
 
 class JuegoDiezMil:
@@ -80,9 +81,9 @@ def main():
     # Entrenamiento
     if TRAIN:
         ambiente = AmbienteDiezMil()
-        agente = AgenteQLearning(ambiente, 0.05, 0.7, 0.05)
-        agente.entrenar(1000000)
-        agente.guardar_politica('lr=.05_desc=.7_eps=.05_1M_train_policy.json')
+        agente = AgenteQLearning(ambiente, 0.05, 0.65, 0.05)
+        agente.entrenar(100000)
+        agente.guardar_politica('lr=.05_desc=.65_eps=.05_100k_train_policy.json')
 
     # Juego
     # jugador = JugadorEntrenado('test', 'test_policy.json')
@@ -92,10 +93,10 @@ def main():
 
     if RUN_AVG_TURN_TEST:
         averages = []
-        for _ in range(1):
+        for _ in tqdm(range(10)):
             avg = 0
+            jugador = JugadorEntrenado('FinalAgent', 'lr=.05_desc=.65_eps=.05_100k_train_policy.json')
             for _ in range(10000):
-                jugador = JugadorEntrenado('FinalAgent', 'lr=.05_desc=.7_eps=.05_1M_train_policy.json')
                 juego = JuegoDiezMil(jugador)
                 (cantidad_turnos, puntaje_final) = juego.jugar(verbose=False)
                 avg += cantidad_turnos
