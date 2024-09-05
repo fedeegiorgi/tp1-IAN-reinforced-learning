@@ -50,12 +50,14 @@ class AmbienteDiezMil:
         assert accion in self.acciones_posibles
         recompensa = self.estado_actual.puntos_turno
         partida_terminada = False
+        turnos_al_terminar = 0
 
         if accion == JUGADA_PLANTARSE:
             self.puntos_totales += self.estado_actual.puntos_turno
 
             if self.puntos_totales >= 10000:
                 partida_terminada = True
+                turnos_al_terminar = self.turno_actual
                 recompensa = 10000 / self.turno_actual
                 self.reset()
             else:
@@ -76,7 +78,7 @@ class AmbienteDiezMil:
                 self.estado_actual.dados = len(dados_restantes)
                 self.estado_actual.puntos_turno += puntos_tirada
 
-        return recompensa, partida_terminada
+        return recompensa, partida_terminada, turnos_al_terminar
 
 
 class EstadoDiezMil:
@@ -133,6 +135,7 @@ class AgenteQLearning:
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
+        self.progreso = []
 
     def elegir_accion(self, eps_greedy=True):
         """
@@ -186,7 +189,9 @@ class AgenteQLearning:
             while not termino_episodio:
                 accion_elegida = self.elegir_accion()
                 qlearn_key = str(self.ambiente.estado_actual)
-                recompensa, termino_episodio = self.ambiente.step(accion_elegida)
+                recompensa, termino_episodio, turnos_al_terminar = self.ambiente.step(accion_elegida)
+                if termino_episodio:
+                    self.progreso.append(turnos_al_terminar)
                 self.actualizar_tabla(qlearn_key, recompensa, accion_elegida)
 
     def guardar_politica(self, filename: str):

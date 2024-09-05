@@ -1,14 +1,16 @@
 import os
 import math
+import copy
 from tqdm import tqdm
 from random import randint
+import matplotlib.pyplot as plt
 from utils import puntaje_y_no_usados, separar, JUGADA_PLANTARSE, JUGADA_TIRAR
 from jugador import Jugador, JugadorAleatorio, JugadorSiempreSePlanta
 from template import AmbienteDiezMil, EstadoDiezMil, AgenteQLearning, JugadorEntrenado
-import copy
 
 TRAIN = True
-RUN_AVG_TURN_TEST = True
+RUN_AVG_TURN_TEST = False
+GRAFICO = True
 
 class JuegoDiezMil:
     def __init__(self, jugador: Jugador):
@@ -101,6 +103,7 @@ def grid_search_hiperparametros(lr_range, gamma_range, eps_range, episodios, can
                 if turnos_promedio < mejor_promedio:
                     mejor_promedio = turnos_promedio
                     agente.guardar_politica('best_training_policy.json')
+                    best_progreso = agente.progreso
                     best_lr, best_gamma, best_eps = lr, gamma, eps
                     if verbose:
                         print(f'Nuevo mejor promedio obtenido: {turnos_promedio}. LR: {lr:.2f} | Gamma: {gamma:.2f} | Epsilon: {eps:.2f}')
@@ -117,14 +120,21 @@ def grid_search_hiperparametros(lr_range, gamma_range, eps_range, episodios, can
     if verbose:
         print(f'Mejores hiperparametros obtenidos: LR: {best_lr} | Gamma: {best_gamma} | Epsilon: {best_eps}')
 
-    return best_lr, best_gamma, best_eps
+    return best_lr, best_gamma, best_eps, best_progreso
 
 def main():
     if TRAIN:
         lr_list = [0.05, 0.1, 0.2]
         gamma_list = [0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 1]
         eps_list = [0.05, 0.1, 0.2]
-        best_lr, best_gamma, best_eps = grid_search_hiperparametros(lr_list, gamma_list, eps_list, 10000, 10000)
+        best_lr, best_gamma, best_eps, best_progreso = grid_search_hiperparametros(lr_list, gamma_list, eps_list, 2, 2)
+
+        if GRAFICO:
+            plt.plot(best_progreso)
+            plt.title('Progreso del mejor agente entrenado')
+            plt.xlabel('Episodio')
+            plt.ylabel('Turnos al terminar')
+            plt.savefig('progreso_agente_entrenado.png')
 
     if RUN_AVG_TURN_TEST:
         n_partidas = 100000
