@@ -7,7 +7,7 @@ from jugador import Jugador, JugadorAleatorio, JugadorSiempreSePlanta
 from template import AmbienteDiezMil, EstadoDiezMil, AgenteQLearning, JugadorEntrenado
 import copy
 
-TRAIN = False
+TRAIN = True
 RUN_AVG_TURN_TEST = True
 
 class JuegoDiezMil:
@@ -100,7 +100,7 @@ def grid_search_hiperparametros(lr_range, gamma_range, eps_range, episodios, can
                 turnos_promedio = get_promedio_turnos(jugador, cant_partidas_promedio)
                 if turnos_promedio < mejor_promedio:
                     mejor_promedio = turnos_promedio
-                    mejor_agente = agente
+                    agente.guardar_politica('best_training_policy.json')
                     best_lr, best_gamma, best_eps = lr, gamma, eps
                     if verbose:
                         print(f'Nuevo mejor promedio obtenido: {turnos_promedio}. LR: {lr:.2f} | Gamma: {gamma:.2f} | Epsilon: {eps:.2f}')
@@ -108,7 +108,6 @@ def grid_search_hiperparametros(lr_range, gamma_range, eps_range, episodios, can
                     if verbose:
                         print(f'Promedio obtenido: {turnos_promedio} [LR: {lr:.2f} | Gamma: {gamma:.2f} | Epsilon: {eps:.2f}]')
     
-    mejor_agente.guardar_politica('best_training_policy.json')
     # Si el archivo se corre por fuera de la carpeta y el archivo se genera afuera, no borrarlo pero no tirar error.
     try:
         os.remove('test_policy.json')
@@ -126,10 +125,6 @@ def main():
         gamma_list = [0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 1]
         eps_list = [0.05, 0.1, 0.2]
         best_lr, best_gamma, best_eps = grid_search_hiperparametros(lr_list, gamma_list, eps_list, 10000, 10000)
-        ambiente = AmbienteDiezMil()
-        agente = AgenteQLearning(ambiente, best_lr, best_gamma, best_eps)
-        agente.entrenar(100000, verbose=True)
-        agente.guardar_politica('agent_policy.json')
 
     if RUN_AVG_TURN_TEST:
         n_partidas = 100000
