@@ -8,9 +8,9 @@ from utils import puntaje_y_no_usados, separar, JUGADA_PLANTARSE, JUGADA_TIRAR
 from jugador import Jugador, JugadorAleatorio, JugadorSiempreSePlanta
 from template import AmbienteDiezMil, EstadoDiezMil, AgenteQLearning, JugadorEntrenado
 
-TRAIN = True
-RUN_AVG_TURN_TEST = False
-GRAFICO = True
+TRAIN = False
+RUN_AVG_TURN_TEST = True
+GRAFICO = False
 
 class JuegoDiezMil:
     def __init__(self, jugador: Jugador):
@@ -88,7 +88,6 @@ def get_promedio_turnos(jugador, num_partidas, verbose=False):
 def grid_search_hiperparametros(lr_range, gamma_range, eps_range, episodios, cant_partidas_promedio, verbose=True):
     ambiente = AmbienteDiezMil()
     mejor_promedio = math.inf
-    mejor_agente = None
 
     for lr in lr_range:
         for gamma in gamma_range:
@@ -110,7 +109,7 @@ def grid_search_hiperparametros(lr_range, gamma_range, eps_range, episodios, can
                 else:
                     if verbose:
                         print(f'Promedio obtenido: {turnos_promedio} [LR: {lr:.2f} | Gamma: {gamma:.2f} | Epsilon: {eps:.2f}]')
-    
+
     # Si el archivo se corre por fuera de la carpeta y el archivo se genera afuera, no borrarlo pero no tirar error.
     try:
         os.remove('test_policy.json')
@@ -125,9 +124,9 @@ def grid_search_hiperparametros(lr_range, gamma_range, eps_range, episodios, can
 def main():
     if TRAIN:
         lr_list = [0.05, 0.1, 0.2]
-        gamma_list = [0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 1]
+        gamma_list = [0.65, 0.7, 0.75, 0.8, 0.85]
         eps_list = [0.05, 0.1, 0.2]
-        best_lr, best_gamma, best_eps, best_progreso = grid_search_hiperparametros(lr_list, gamma_list, eps_list, 2, 2)
+        best_lr, best_gamma, best_eps, best_progreso = grid_search_hiperparametros(lr_list, gamma_list, eps_list, 1_000_000, 10000)
 
         if GRAFICO:
             plt.plot(best_progreso)
@@ -140,7 +139,8 @@ def main():
         n_partidas = 100000
         jugador = JugadorEntrenado('QLearningAgent', 'best_training_policy.json')
         avg = get_promedio_turnos(jugador, n_partidas, verbose=True)
-        print(f'Resultado obtenido con el agente que jugó {n_partidas} partidas: {avg}')
+        print(f'Resultado obtenido con el agente que jugo {n_partidas} partidas: {avg}')
+
 
 if __name__ == '__main__':
     main()
