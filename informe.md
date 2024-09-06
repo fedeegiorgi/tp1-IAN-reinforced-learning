@@ -64,10 +64,10 @@ Para las recompensas probamos distintos approaches:
 
 Con el setup ya armado con las decisiones explicadas anteriormente, decidimos realizar una breve búsqueda de hiperparámetros con un grid search que incluye valores en cada posible variable los cuales nos parecían razonables y con los que probando un poco manualmente obtuvimos mejores resultados.
 
-Los resultados fueron un alpha ($\alpha$) de $0.05$ gamma ($\gamma$) de $0.7$ y un epsilon ($\epsilon$) de $0.05$.
+Los resultados fueron un alpha ($\alpha$) de $0.05$ gamma ($\gamma$) de $0.75$ y un epsilon ($\epsilon$) de $0.2$.
 
 # Resultados
 
-Tras realizar un entrenamiento de $1000000$ episodios y hacer jugar a $50$ agentes $10000$ partidas cada uno, obtuvimos un promedio de $21.7$ turnos para finalizar el juego, superando ampliamente al agente random y al que siempre decide plantarse, los cuales realizando el mismo testeo nos dieron promedios de $25.3$ y $27.2$.
+Tras realizar un entrenamiento de $1000000$ episodios para cada conjunto posible de hiperparámetros, obtuvimos los mencionados anteriormente y nos guardamos la política obtenida. Luego de crear a un nuevo agente con esa misma polícia y hacerlo jugar $100000$ partidas, obtuvimos un promedio de $21.59$ turnos para finalizar el juego, superando ampliamente al agente random y al que siempre decide plantarse, los cuales realizando el mismo testeo nos dieron promedios de $25.27$ y $27.04$.
 
-La política aprendida por nuestro agente se puede encontrar en `agent_policy.json`.
+La política aprendida por nuestro agente se puede encontrar en `best_training_policy.json` y los resultados tanto del grid search como de estos ultimos tres experimentos de hacer jugar a los distintos agentes se pueden encontrar en `resultados.txt`.

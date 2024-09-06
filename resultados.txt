@@ -90,3 +90,6 @@ Probando con: LR = 0.20 | Gamma: 0.85 | Epsilon: 0.20
 Promedio obtenido: 22.6361 [LR: 0.20 | Gamma: 0.85 | Epsilon: 0.20]
 Mejores hiperparametros obtenidos: LR: 0.05 | Gamma: 0.75 | Epsilon: 0.2
 Mejor promedio obtenido: 21.605
+Resultado obtenido con el agente que jugo 100000 partidas: 21.59348
+Resultado con el agente que se planta siempre: 25.27345
+Resultado con el agente random: 27.0497
