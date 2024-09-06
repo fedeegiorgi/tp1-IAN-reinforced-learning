@@ -1,12 +1,11 @@
 import os
 import math
-import copy
 from tqdm import tqdm
 from random import randint
 import matplotlib.pyplot as plt
 from utils import puntaje_y_no_usados, separar, JUGADA_PLANTARSE, JUGADA_TIRAR
-from jugador import Jugador, JugadorAleatorio, JugadorSiempreSePlanta
-from template import AmbienteDiezMil, EstadoDiezMil, AgenteQLearning, JugadorEntrenado
+from jugador import Jugador
+from template import AmbienteDiezMil, AgenteQLearning, JugadorEntrenado
 
 TRAIN = False
 RUN_AVG_TURN_TEST = True
