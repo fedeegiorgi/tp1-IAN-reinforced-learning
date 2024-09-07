@@ -7,10 +7,9 @@ from utils import puntaje_y_no_usados, JUGADA_PLANTARSE, JUGADA_TIRAR
 
 class AmbienteDiezMil:
     def __init__(self):
-        """
-        Definir las variables de instancia de un ambiente.
-        ¿Qué es propio de un ambiente de 10.000?
-        """
+        '''
+        Definir las variables internas de un ambiente de Diez Mil.
+        '''
 
         self.turno_actual = 1
         self.estado_actual = EstadoDiezMil(6, 0)
@@ -18,25 +17,31 @@ class AmbienteDiezMil:
         self.min_max_cara_dado = [1, 6]
         self.acciones_posibles = [JUGADA_PLANTARSE, JUGADA_TIRAR]
 
-    def tirada(self, cant_dados):
-        """
+    def tirada(self, cant_dados) -> list[int]:
+        '''
         Devuelve los resultados de una tirada al pedirsela al ambiente.
-        """
+
+        Args:
+            cant_dados (int): Cantidad de dados a tirar.
+        
+        Returns:
+            list[int]: Resultados de la tirada.
+        '''
 
         min_cara, max_cara = self.min_max_cara_dado
         return [random.randint(min_cara, max_cara) for _ in range(cant_dados)]
 
     def reset(self):
-        """
+        '''
         Reinicia el ambiente para volver a realizar un episodio.
-        """
+        '''
 
         self.turno_actual = 1
         self.estado_actual = EstadoDiezMil(6, 0)
         self.puntos_totales = 0
 
-    def step(self, accion):
-        """
+    def step(self, accion) -> tuple[int, bool]:
+        '''
         Dada una acción devuelve una recompensa.
         El estado es modificado acorde a la acción y su interacción con el ambiente.
         Podría ser útil devolver si terminó o no el turno.
@@ -46,7 +51,7 @@ class AmbienteDiezMil:
 
         Returns:
             tuple[int, bool]: Una recompensa y un flag que indica si terminó el episodio.
-        """
+        '''
         assert accion in self.acciones_posibles
         recompensa = self.estado_actual.puntos_turno
         partida_terminada = False
@@ -57,7 +62,6 @@ class AmbienteDiezMil:
 
             if self.puntos_totales >= 10000:
                 partida_terminada = True
-                turnos_al_terminar = self.turno_actual
                 recompensa = 10000 / self.turno_actual
                 self.reset()
             else:
@@ -78,35 +82,38 @@ class AmbienteDiezMil:
                 self.estado_actual.dados = len(dados_restantes)
                 self.estado_actual.puntos_turno += puntos_tirada
 
-        return recompensa, partida_terminada, turnos_al_terminar
+        return recompensa, partida_terminada
 
 
 class EstadoDiezMil:
     def __init__(self, dados, puntos_turno):
-        """
-        Definir qué hace a un estado de diez mil.
-        Recordar que la complejidad del estado repercute en la complejidad de la tabla del agente de q-learning.
-        """
+        '''
+        Define el estado de un juego de Diez Mil.
+
+        Args:
+            int: Cantidad de dados disponibles.
+            int: Puntos acumulados en el turno.
+        '''
 
         self.dados = dados
         self.puntos_turno = puntos_turno
 
     def fin_turno(self):
-        """
+        '''
         Modifica el estado al terminar el turno.
-        """
+        '''
 
         self.puntos_turno = 0
         self.dados = 6
 
     def __str__(self):
-        """
+        '''
         Representación en texto de EstadoDiezMil.
         Ayuda a tener una versión legible del objeto.
 
         Returns:
             str: Representación en texto de EstadoDiezMil.
-        """
+        '''
 
         return f'cant_dados: {self.dados} | puntos_turno: {self.puntos_turno}'
 
@@ -120,7 +127,7 @@ class AgenteQLearning:
         *args,
         **kwargs
     ):
-        """
+        '''
         Definir las variables internas de un Agente que implementa el algoritmo de Q-Learning.
 
         Args:
@@ -128,19 +135,18 @@ class AgenteQLearning:
             alpha (float): Tasa de aprendizaje.
             gamma (float): Factor de descuento.
             epsilon (float): Probabilidad de explorar.
-        """
+        '''
 
         self.qlearning_tabla: dict[str, list[float]] = {}
         self.ambiente = ambiente
         self.alpha = alpha
         self.gamma = gamma
         self.epsilon = epsilon
-        self.progreso = []
 
     def elegir_accion(self, eps_greedy=True):
-        """
+        '''
         Selecciona una acción de acuerdo a una política ε-greedy.
-        """
+        '''
         qlearn_key = str(self.ambiente.estado_actual)
 
         # Empate entre q-values
@@ -164,14 +170,14 @@ class AgenteQLearning:
         self.qlearning_tabla[key][accion_elegida] += self.alpha * (recompensa + self.gamma * max_q - q_actual)
 
     def entrenar(self, episodios: int, verbose: bool = False) -> None:
-        """
+        '''
         Dada una cantidad de episodios, se repite el ciclo del algoritmo de Q-learning.
         Recomendación: usar tqdm para observar el progreso en los episodios.
 
         Args:
             episodios (int): Cantidad de episodios a iterar.
             verbose (bool, optional): Flag para hacer visible qué ocurre en cada paso. Defaults to False.
-        """
+        '''
         for N in range(7):
             for Y in range(0, 20001, 50):
 
@@ -189,18 +195,16 @@ class AgenteQLearning:
             while not termino_episodio:
                 accion_elegida = self.elegir_accion()
                 qlearn_key = str(self.ambiente.estado_actual)
-                recompensa, termino_episodio, turnos_al_terminar = self.ambiente.step(accion_elegida)
-                if termino_episodio:
-                    self.progreso.append(turnos_al_terminar)
+                recompensa, termino_episodio = self.ambiente.step(accion_elegida)
                 self.actualizar_tabla(qlearn_key, recompensa, accion_elegida)
 
     def guardar_politica(self, filename: str):
-        """
+        '''
         Almacena la política del agente en un formato conveniente.
 
         Args:
             filename (str): Nombre/Path del archivo a generar.
-        """
+        '''
 
         with open(filename, 'w') as jsonfile:
             json.dump(self.qlearning_tabla, jsonfile, indent=4)
@@ -211,13 +215,13 @@ class JugadorEntrenado(Jugador):
         self.politica = self._leer_politica(filename_politica)
 
     def _leer_politica(self, filename: str, SEP: str = ','):
-        """
+        '''
         Carga una politica entrenada con un agente de RL, que está guardada
         en el archivo filename en un formato conveniente.
 
         Args:
             filename (str): Nombre/Path del archivo que contiene a una política almacenada. 
-        """
+        '''
 
         with open(filename, 'r') as jsonfile:
             politica = json.load(jsonfile)
@@ -229,7 +233,7 @@ class JugadorEntrenado(Jugador):
         puntaje_turno: int,
         dados: list[int],
     ) -> tuple[int, list[int]]:
-        """
+        '''
         Devuelve una jugada y los dados a tirar.
 
         Args:
@@ -239,7 +243,7 @@ class JugadorEntrenado(Jugador):
 
         Returns:
             tuple[int,list[int]]: Una jugada y la lista de dados a tirar.
-        """
+        '''
         nuevos_puntos, no_usados = puntaje_y_no_usados(dados)
 
         estado = f'cant_dados: {len(no_usados)} | puntos_turno: {puntaje_turno + nuevos_puntos}'
